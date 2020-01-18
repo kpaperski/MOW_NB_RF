@@ -3,13 +3,13 @@
 # Created by: karol
 # Created on: 02.01.2020
 
-walc_r_f <- function (stud_merge) {
+alc_rf <- function (stud_merge_D, colname) {
   set.seed(100) #podział na zb testowy i treningowy
-  idx <- initial_split(data = stud_merge, prop = 0.8, strata = "Walc")
+  idx <- initial_split(data = stud_merge_D, prop = 0.8, strata = colname)
   train <- training(idx)
   test <- testing(idx)
   ctrl <- trainControl(method = "repeatedcv", number = 5, repeats = 5)
-  model_RF_Day <- train(Walc~., data = train, method = "rf", ntree = 100, trControl = ctrl)
+  model_RF_Day <- train(Dalc~., data = train, method = "rf", ntree = 6, trControl = ctrl)
   saveRDS(model_RF_Day, "model/Random_Forest_model.RDS")
   #model_RF_Day <- readRDS("model/Random_Forest_model.RDS")
 
@@ -28,18 +28,18 @@ walc_r_f <- function (stud_merge) {
     conf_mat(Dalc, Dalc_pred) %>%
     autoplot(type = "heatmap")
 
-  print(confusionMatrix(data = RF_Day_pred, reference = test$Walc))
+  print(confusionMatrix(data = RF_Day_pred, reference = test[[colname]]))
 
   RF_ROC <- data.frame(prediction1 = RF_Day_prob[,1],
-                        actual1 = as.numeric(RF_table_Day$Walc == 1),
+                        actual1 = as.numeric(RF_table_Day[[colname]] == 1),
                         prediction2 = RF_Day_prob[,2],
-                        actual2 = as.numeric(RF_table_Day$Walc == 2),
+                        actual2 = as.numeric(RF_table_Day[[colname]] == 2),
                         prediction3 = RF_Day_prob[,3],
-                        actual3 = as.numeric(RF_table_Day$Walc == 3),
+                        actual3 = as.numeric(RF_table_Day[[colname]] == 3),
                         prediction4 = RF_Day_prob[,4],
-                        actual4 = as.numeric(RF_table_Day$Walc == 4),
+                        actual4 = as.numeric(RF_table_Day[[colname]] == 4),
                         prediction5 = RF_Day_prob[,5],
-                        actual5 = as.numeric(RF_table_Day$Walc == 5))
+                        actual5 = as.numeric(RF_table_Day[[colname]] == 5))
   #head(NB_ROC)
 
   pred_roc1_RF <- prediction(RF_ROC$prediction1, RF_ROC$actual1)

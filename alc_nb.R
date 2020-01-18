@@ -3,21 +3,29 @@
 # Created by: karol
 # Created on: 02.01.2020
 
-dalc_n_b <- function (stud_merge_D) {
+library(e1071)
+library(dplyr)
+library(rsample)
+library(tidymodels)
+library(caret)
+library(ROCR)
+library(infotheo)
+
+alc_nb <- function (stud_merge_D, colname) {
   set.seed(100) #podział na zb testowy i treningowy
-  idx <- initial_split(data = stud_merge_D, prop = 0.8, strata = "Dalc")
+  idx <- initial_split(data = stud_merge_D, prop = 0.8, strata = colname)
   train <- training(idx)
   test <- testing(idx)
 
-  prop.table(table(train$Dalc))
-  prop.table(table(test$Dalc))
+  prop.table(table(train[[colname]]))
+  prop.table(table(test[[colname]]))
 
-  model_NB_Day <- naiveBayes(x = train, y = train$Dalc, laplace = 1)
+  model_NB_Day <- naiveBayes(x = train, y = train[[colname]], laplace = 1)
 
   NB_Day_pred <- predict(model_NB_Day, test, type = "class")
   NB_Day_prob <- predict(model_NB_Day, test, type = "raw")
 
-  NB_table_Day <- select(test, Dalc) %>%
+  NB_table_Day <- select(test, colname) %>%
     bind_cols(Dalc_pred = NB_Day_pred) %>%
     bind_cols(Dalc_1prob = round(NB_Day_prob[,1],4)) %>%
     bind_cols(Dalc_2prob = round(NB_Day_prob[,2],4)) %>%
@@ -26,23 +34,23 @@ dalc_n_b <- function (stud_merge_D) {
     bind_cols(Dalc_5prob = round(NB_Day_prob[,5],4))
 
   NB_table_Day %>%
-    conf_mat(Dalc, Dalc_pred) %>%
+    conf_mat(colname, Dalc_pred) %>%
     autoplot(type = "heatmap")
 
-  print(confusionMatrix(data = NB_Day_pred, reference = test$Dalc))
+  print(confusionMatrix(data = NB_Day_pred, reference = test[[colname]]))
 
   #head(NB_Day_prob)
 
   NB_ROC <- data.frame(prediction1 = NB_Day_prob[,1],
-                        actual1 = as.numeric(NB_table_Day$Dalc == 1),
+                        actual1 = as.numeric(NB_table_Day[[colname]] == 1),
                         prediction2 = NB_Day_prob[,2],
-                        actual2 = as.numeric(NB_table_Day$Dalc == 2),
+                        actual2 = as.numeric(NB_table_Day[[colname]] == 2),
                         prediction3 = NB_Day_prob[,3],
-                        actual3 = as.numeric(NB_table_Day$Dalc == 3),
+                        actual3 = as.numeric(NB_table_Day[[colname]] == 3),
                         prediction4 = NB_Day_prob[,4],
-                        actual4 = as.numeric(NB_table_Day$Dalc == 4),
+                        actual4 = as.numeric(NB_table_Day[[colname]] == 4),
                         prediction5 = NB_Day_prob[,5],
-                        actual5 = as.numeric(NB_table_Day$Dalc == 5))
+                        actual5 = as.numeric(NB_table_Day[[colname]] == 5))
   #head(NB_ROC)
 
   pred_roc1 <- prediction(NB_ROC$prediction1, NB_ROC$actual1)

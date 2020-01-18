@@ -3,7 +3,7 @@
 # Created by: karol
 # Created on: 02.01.2020
 
-dalc_analysis <- function (stud_merge_D) {
+alc_analysis <- function (stud_merge_D) {
   st_mg <-discretize(stud_merge_D)
   mutinf <- c()
   chisqTestpValue <- c()

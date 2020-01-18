@@ -10,11 +10,9 @@ library(tidymodels)
 library(caret)
 library(ROCR)
 library(infotheo)
-source("Dalc_RF.R")
-source("Dalc_analysis.R")
-source("Dalc_NB.R")
-source("Walc_RF.R")
-source("Walc_NB.R")
+source("alc_analysis.R")
+source("alc_nb.R")
+source("alc_rf.R")
 
 stud_math <- read.csv("student-mat.csv")
 stud_port <- read.csv("student-por.csv")
@@ -38,16 +36,24 @@ stud_merge <- stud_merge %>%
   ) %>%
   select(-c(G1,G2,G3))
 
+#Workday analysis
 stud_merge_D <- stud_merge %>%
-  select(-c(Walc))
+  select(-Walc)
 
-#dalc_analysis(stud_merge_D)
-#dalc_n_b(stud_merge_D)
-#dalc_r_f(stud_merge_D)
+print("Workday")
+alc_analysis(stud_merge_D)
+print("Workday Naive Bayes")
+alc_nb(stud_merge_D, "Dalc")
+print("Workday Random Forest")
+alc_rf(stud_merge_D, "Dalc")
 
+
+#Weekend analysis
 stud_merge_W <- stud_merge %>%
-  select(-c(Dalc))
-
-#dalc_analysis(stud_merge_W)
-#walc_n_b(stud_merge_D)
-#walc_r_f(stud_merge_D)
+  select(-Dalc)
+print("Weekend")
+alc_analysis(stud_merge_W)
+print("Weekend Naive Bayes")
+alc_nb(stud_merge_W, "Walc")
+print("Weekend Random Forest")
+alc_rf(stud_merge_W, "Walc")
