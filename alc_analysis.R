@@ -1,8 +1,3 @@
-# Title     : TODO
-# Objective : TODO
-# Created by: karol
-# Created on: 02.01.2020
-
 alc_analysis <- function (stud_merge_D) {
   st_mg <-discretize(stud_merge_D)
   mutinf <- c()
